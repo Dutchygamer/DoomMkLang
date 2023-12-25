@@ -22,8 +22,10 @@
 
         static void Main(string[] args)
         {
+            var service = new Service();
+            service.DoTheThings();
             // See https://aka.ms/new-console-template for more information
-            Console.WriteLine("I live!");
+            //Console.WriteLine("I live!");
         }
     }
 }
