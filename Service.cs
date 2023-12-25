@@ -59,9 +59,9 @@ namespace DoomMkLang
 
                 result.Add(new LoreEntry
                 {
-                    Tag = tagText,
-                    Tab = tabText,
-                    RelatedTags = relText,
+                    Tag = tagText.Replace("\r\n", ""),
+                    Tab = tabText.Replace("\r\n", ""),
+                    RelatedTags = relText.Replace("\r\n", ""),
                     Text = txtText,
                 });
 
@@ -81,20 +81,68 @@ namespace DoomMkLang
         private void WriteToLanguage(IEnumerable<LoreEntry> loreEntries)
         {
             // var languageFile = File.OpenWrite(_languageFileLocation);
+            var languageText = string.Empty;
 
-            var defaultText = "[default]\r\n// always overrule this entry so we can hook up our new entries\r\nSWWM_LOREREL_DEMONINVASION = \"Hell;UAC;Demolitionist;WhiteScar;Nukuri;Doomguy;Anarukon;Saya;Archdemons;FormerHumans;DemonicForces\";";
+            // we always want to add this bit first which marks the file as a Doom language file and appends the DemomInvasion entry's tags with our own tags
+            var defaultText = "[default]\r\n";
+            defaultText += "// always overrule this entry so we can hook up our new entries\r\n";
+            defaultText += "SWWM_LOREREL_DEMONINVASION = \"Hell;UAC;Demolitionist;WhiteScar;Nukuri;Doomguy;Anarukon;Saya;Archdemons;FormerHumans;DemonicForces\";\r\n";
+            languageText += defaultText;
 
-            File.WriteAllText(_languageFileLocation, defaultText);
+            // then add the text per lore entry
+            foreach (var loreEntry in loreEntries)
+            {
+                var loreEntryText = string.Empty;
+
+                var identifier = loreEntry.GetTagTitle();
+
+                loreEntryText += $"SWWM_LORETAG_{identifier} = \"{loreEntry.Tag}\"\r\n";
+                loreEntryText += $"SWWM_LORETAB_{identifier} = \"{loreEntry.Tab}\"\r\n";
+                loreEntryText += $"SWWM_LOREREL_{identifier} = \"{loreEntry.RelatedTags}\"\r\n";
+
+                // the actual lore text is a bit more complex
+                // basicly we want to split the massive string into separate strings based on the newLine (\r\n)
+                // after that we want to surround the splitted strings into "" and suffix it with a \n
+                // this means that each newLine split (which includes empty lines) will get converted into a separate line in the language file
+                loreEntryText += $"SWWM_LORETXT_{identifier}\r\n";
+                bool skipLine = true;
+                var loreTextLines = loreEntry.Text.Split("\r\n");
+                foreach (var loreTextLine in loreTextLines)
+                {
+                    // we want to skip the first newLine
+                    if (skipLine == true && loreTextLine == "")
+                    {
+                        skipLine = false;
+                        continue;
+                    }
+
+                    //TODO **{text}** moet je vervangen door \cf{text}\c-
+                    //TODO laatste regel in entry heeft geen \n in de quotes nodig
+
+                    // each entry should end with a \n within the quotes, and a \n outside the quotes so it becomes a new line in the language file
+                    loreEntryText += $"\"{loreTextLine}\\n\"\n";
+                }
+
+                languageText += loreEntryText;
+            }
+
+
+            File.WriteAllText(_languageFileLocation, languageText);
 
             // languageFile.Write(defaultText);
         }
 
         public class LoreEntry
         {
-            public string Tag {get; set;}
-            public string Tab {get; set;}
-            public string RelatedTags {get; set;}
-            public string Text {get; set;}
+            public string Tag { get; set; }
+            public string GetTagTitle()
+            {
+               return Tag.Replace(" ", "").ToUpper(); 
+            }
+
+            public string Tab { get; set; }
+            public string RelatedTags { get; set; }
+            public string Text { get; set; }
         }
     }
 }
