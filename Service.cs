@@ -23,7 +23,6 @@ namespace DoomMkLang
             WriteToLanguage(loreEntries);
         }
 
-
         private IEnumerable<LoreEntry> ReadLoreEntries()
         {
             var result = new List<LoreEntry>();
@@ -81,7 +80,13 @@ namespace DoomMkLang
 
         private void WriteToLanguage(IEnumerable<LoreEntry> loreEntries)
         {
-            // var languageFile = File.Open(_languageFileLocation);
+            // var languageFile = File.OpenWrite(_languageFileLocation);
+
+            var defaultText = "[default]\r\n// always overrule this entry so we can hook up our new entries\r\nSWWM_LOREREL_DEMONINVASION = \"Hell;UAC;Demolitionist;WhiteScar;Nukuri;Doomguy;Anarukon;Saya;Archdemons;FormerHumans;DemonicForces\";";
+
+            File.WriteAllText(_languageFileLocation, defaultText);
+
+            // languageFile.Write(defaultText);
         }
 
         public class LoreEntry
