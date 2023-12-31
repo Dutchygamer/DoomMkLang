@@ -15,7 +15,7 @@ namespace DoomMkLang
         {
             var loreEntries = ReadLoreEntries();
 
-            if(loreEntries?.Any() != true)
+            if (loreEntries?.Any() != true)
             {
                 return;
             }
@@ -34,6 +34,7 @@ namespace DoomMkLang
                 var rawText = File.ReadAllText(loreFile.FullName);
 
                 //TODO dit zou een regex ding kunnen zijn?
+                //TODO we moeten alleen op de eerste instantie van de genoemde text splitsen, niet op alles wat erna komt!
 
                 //var eugh = rawText.Split(new string[] { "TAG, TAB, REL, TXT" }, StringSplitOptions.None);
 
@@ -64,15 +65,6 @@ namespace DoomMkLang
                     RelatedTags = relText.Replace("\r\n", ""),
                     Text = txtText,
                 });
-
-                //TODO dis niet nodig, je moet object maken en dan fixen we het bij writen wel :)
-                // tagText = "TAG\r\n" + tagText;
-                // tabText = "TAB\r\n" + tabText;
-                // relText = "REL\r\n" + relText;
-                // txtText = "TXT\r\n" + txtText;
-
-
-                // var shizzle = "";
             }
 
             return result;
@@ -104,7 +96,7 @@ namespace DoomMkLang
                 // basicly we want to split the massive string into separate strings based on the newLine (\r\n)
                 // after that we want to surround the splitted strings into "" and suffix it with a \n
                 // this means that each newLine split (which includes empty lines) will get converted into a separate line in the language file
-                loreEntryText += $"SWWM_LORETXT_{identifier}\r\n";
+                loreEntryText += $"SWWM_LORETXT_{identifier} = \r\n";
                 bool skipLine = true;
                 var loreTextLines = loreEntry.Text.Split("\r\n");
                 foreach (var loreTextLine in loreTextLines)
@@ -118,7 +110,7 @@ namespace DoomMkLang
 
                     //TODO **{text}** moet je vervangen door \cf{text}\c-
                     //TODO laatste regel in entry heeft geen \n in de quotes nodig
-
+                    
                     // each entry should end with a \n within the quotes, and a \n outside the quotes so it becomes a new line in the language file
                     loreEntryText += $"\"{loreTextLine}\\n\"\n";
                 }
@@ -126,13 +118,11 @@ namespace DoomMkLang
                 languageText += loreEntryText;
             }
 
-
+            // write everything to the file in the most simple way possible
             File.WriteAllText(_languageFileLocation, languageText);
-
-            // languageFile.Write(defaultText);
         }
 
-        public class LoreEntry
+        private class LoreEntry
         {
             public string Tag { get; set; }
             public string GetTagTitle()
