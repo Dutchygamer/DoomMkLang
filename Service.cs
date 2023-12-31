@@ -88,9 +88,9 @@ namespace DoomMkLang
 
                 var identifier = loreEntry.GetTagTitle();
 
-                loreEntryText += $"SWWM_LORETAG_{identifier} = \"{loreEntry.Tag}\"\r\n";
-                loreEntryText += $"SWWM_LORETAB_{identifier} = \"{loreEntry.Tab}\"\r\n";
-                loreEntryText += $"SWWM_LOREREL_{identifier} = \"{loreEntry.RelatedTags}\"\r\n";
+                loreEntryText += $"SWWM_LORETAG_{identifier} = \"{loreEntry.Tag}\";\r\n";
+                loreEntryText += $"SWWM_LORETAB_{identifier} = \"{loreEntry.Tab}\";\r\n";
+                loreEntryText += $"SWWM_LOREREL_{identifier} = \"{loreEntry.RelatedTags}\";\r\n";
 
                 // the actual lore text is a bit more complex
                 // basicly we want to split the massive string into separate strings based on the newLine (\r\n)
@@ -110,6 +110,7 @@ namespace DoomMkLang
 
                     //TODO **{text}** moet je vervangen door \cf{text}\c-
                     //TODO laatste regel in entry heeft geen \n in de quotes nodig
+                    //TODO laatste regel moet ook eindigen op ; die buiten de ""
                     
                     // each entry should end with a \n within the quotes, and a \n outside the quotes so it becomes a new line in the language file
                     loreEntryText += $"\"{loreTextLine}\\n\"\n";
